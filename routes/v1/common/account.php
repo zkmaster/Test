@@ -6,8 +6,9 @@ $api->group(['namespace' => 'Common'], function($api) {
 
     $api->post('loginIn', [
         'as' => 'loginIn',
-        'uses' => 'AccountController@loginIn',
+        'uses' => 'AccountController@accountLogin',
         'type' => 0,
+        'desc' => '账户密码登录'
     ]);
 
 });

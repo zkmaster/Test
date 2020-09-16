@@ -8,5 +8,5 @@ use App\Http\Controllers\BaseController as Controller;
 
 class BaseController extends Controller
 {
-
+    protected $process;
 }

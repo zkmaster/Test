@@ -9,7 +9,6 @@ if (!function_exists('validate') ) {
      * @param array $messages
      * @param array $customAttributes
      * @return array
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @author KuanZhang
      * @time 2020/9/2
      */
@@ -34,19 +33,27 @@ if (!function_exists('error')) {
 
     /**
      * error 抛出API自定义异常消息
-     * @param int|null $status_code
+     * @param mixed $status_code
      * @param string|null $message
      * @param Throwable|null $previous
      * @param array $headers
      * @author KuanZhang
      * @time 2020/9/3 13:20
      */
-    function error(int $status_code = null, string $message = null, \Throwable $previous = null, array $headers = [])
+    function error($status_code = null, string $message = null, \Throwable $previous = null, array $headers = [])
     {
+        # 无参数时默认报错
         if ($status_code === null) {
             $status_code = \App\Enum\V1\Error::TEXT_ERROR;
         } else {
-            if ($message === null) $message = config('error' . $status_code) ?: '未知错误0，请及时反馈~';
+            # 无状态码时
+            if (!is_numeric($status_code)) {
+                $message = is_string($status_code) ? $status_code : config('error.' . \App\Enum\V1\Error::TEXT_ERROR);
+                $status_code = \App\Enum\V1\Error::TEXT_ERROR;
+            }else {
+                # 不传提示内容时返回默认错误内容
+                if ($message === null) $message = config('error.' . $status_code) ?: '未知错误0，请及时反馈~';
+            }
         }
 
         Throw new App\Exceptions\ApiException($status_code, $message, $previous, $headers);
@@ -57,7 +64,7 @@ if (!function_exists('error')) {
 if (!function_exists('validateError')) {
 
     /**
-     * validateError
+     * 字段验证异常
      * @param string $message
      * @author KuanZhang
      * @time 2020/9/3 13:21
@@ -65,6 +72,36 @@ if (!function_exists('validateError')) {
     function validateError(string $message)
     {
         error(\App\Enum\V1\Error::VALIDATE_ERROR, $message);
+    }
+
+}
+
+if (!function_exists('objToArray')) {
+
+    /**
+     * 对象转数组（仅支持简单对象）
+     * @param mixed $data
+     * @return array
+     * @author KuanZhang
+     * @time 2020/9/10-15:43:15
+     */
+    function objToArray($data)
+    {
+        if (empty($data)) return [];
+        return json_decode(json_encode($data), true);
+    }
+
+}
+
+if (!function_exists('successResponse')) {
+
+    function successResponse($data = null)
+    {
+        return response()->json([
+            'status_code' => 200,
+            'code' => 200,
+            'data' => $data,
+        ]);
     }
 
 }

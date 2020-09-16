@@ -19,7 +19,7 @@ class PlainText implements Rule
      */
     public function passes($attribute, $value)
     {
-        return preg_match('/^[\w-.\x{4e00}-\x{9fa5}]*$/u', $value) ? true : false;
+        return preg_match('/^[\w-.@\x{4e00}-\x{9fa5}]*$/u', $value) ? true : false;
     }
 
     /**
@@ -29,6 +29,6 @@ class PlainText implements Rule
      */
     public function message()
     {
-        return ':attribute 只能包含中文、英文字母、-、_、.';
+        return ':attribute 只能包含中文、英文字母、英文横线、英文下划线、英文句号、@';
     }
 }
